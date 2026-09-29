@@ -4,10 +4,9 @@
 
 ---
 
-![ArchiMate](img/archimate_boceto.jpeg)
+![ArchiMate](Diagramas/ArchiMate_Boceto_HidroData.png)
 *Figura 3. ArchiMate (boceto E1) — negocio · aplicación · tecnología.*
 
-> ⚠️ **Actualizar el diagrama:** en la capa de tecnología, el nodo “API XM · SIMEM · datos.gov.co” debe decir **“API XM · Sinergox”**, para ser coherente con la fuente real.
 
 ## 1. Capa de negocio
 
