@@ -6,7 +6,7 @@
 
 ## 1. Proceso AS-IS (situación actual)
 
-![BPMN AS-IS](img/bpmn_as_is.png)
+![BPMN AS-IS](Diagramas/BPMN_AS-IS_HidroData.png)
 *Figura 1. BPMN AS-IS — monitoreo manual de reservas hídricas. Marcadores P1–P6 = puntos de dolor.*
 
 **Carriles:** Analista de datos · Gerencia / Comité de riesgo.
@@ -37,7 +37,7 @@ Hoy el monitoreo depende del analista. Una vez por semana, o cuando la gerencia 
 
 ## 3. Proceso TO-BE
 
-![BPMN TO-BE](img/bpmn_to_be.jpeg)
+![BPMN TO-BE](Diagramas/BPMN_TO_BE_HidroData.png)
 *Figura 2. BPMN TO-BE — monitoreo automatizado y gobernado de reservas hídricas.*
 
 **Carriles:** Sistema automatizado · Data Steward · Gerencia / Comité de riesgo.
@@ -56,7 +56,6 @@ Hoy el monitoreo depende del analista. Una vez por semana, o cuando la gerencia 
 | 9 | Decidir acciones y registrar la decisión | Usuario | M6 |
 | Fin | Decisión registrada y trazable | — | O4 |
 
-> ⚠️ **Actualizar el diagrama:** el paso 1 dice “API XM / datos.gov.co”. Como la fuente real es **Sinergox (XM)**, cambiar el rótulo a “API XM / Sinergox” y regenerar la imagen.
 
 ## 4. Mejoras M1–M6
 
