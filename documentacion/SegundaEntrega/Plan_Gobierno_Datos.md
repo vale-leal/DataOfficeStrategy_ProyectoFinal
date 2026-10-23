@@ -1,6 +1,6 @@
 # Plan de Gobierno de Datos — HidroData SIN
 
-**Versión:** 0.2.1 **Fecha:** 23 de octubre de 2026
+**Versión:** 0.2.2 **Fecha:** 23 de octubre de 2026
 **Caso:** HidroCol Generación S.A. E.S.P. 
 **Fuente:** XM — Sinergox, 2022–2026
 **Marco:** DAMA-DMBOK 2 · Ley 1581 de 2012 · Ley 1712 de 2014
@@ -71,12 +71,12 @@ Los conteos y la estructura salen de las filas de muestra del archivo `Dataset_d
 | H1 | Todos los números vienen en formato colombiano: punto para miles y coma para decimales (por ejemplo `148.486.400,00`). | Una lectura directa produce texto o valores mal escalados. | Regla G-01 y política de normalización (§4.1). |
 | H2 | Las granularidades son mixtas: mensual (aportes), diaria (reserva, demanda, vertimientos), horaria (generación y compras) y diaria por recurso (capacidad). | No se pueden cruzar sin una granularidad común. | Granularidad objetivo diaria en la capa curada; reglas de agregación en §8.2. |
 | H3 | **El archivo rotulado «Precio de la energía en bolsa» contiene «Compras Bolsa Nacional (kWh)» por agente y hora. Son cantidades de energía, no un precio en COP/kWh.** | Si se usa como precio, las conclusiones sobre el mercado serían erróneas. El precio de bolsa no está en el conjunto de datos actual. | Regla B-01; pendiente P3: descargar de Sinergox la serie de precio de bolsa (COP/kWh) o excluir el precio del alcance. |
-| H4 | Generación y compras vienen en formato ancho (24 columnas, una por hora) y con una columna «Versión» (valor observado: `TX4`). | Hay que pasarlas a formato largo y decidir qué versión es la vigente. | Transformación T4 (§8.2) y regla GN-03. |
+| H4 | Generación y compras vienen en formato ancho (24 columnas, una por hora) y con una columna «Versión» (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente). | Hay que pasarlas a formato largo y decidir qué versión es la vigente. | Transformación T4 (§8.2) y regla GN-03. |
 | H5 | Vertimientos solo trae filas en los días en que hubo vertimiento (en la muestra: 1 y 2 de enero, 16, 19 y 20). | La ausencia de un día no es un dato faltante; aplicar una regla de cobertura diaria daría falsos errores. | Regla V-04: confirmar con XM que «sin fila = sin vertimiento» y rellenar con 0 solo en la capa curada, con marca. |
 | H6 | En la tabla de demanda hay celdas vacías en demanda no atendida, exportaciones e importaciones, y el balance cuadra al kWh en las 4 filas de muestra. | Las celdas vacías significan «no hubo», no «dato faltante». El balance sirve como regla de consistencia fuerte. | Reglas D-02 y D-03. |
 | H7 | Las unidades no son homogéneas: kWh, kW, m³/s, miles de m³ y %. Generación y capacidad vienen en kW; demanda y aportes en kWh. | Sumar o comparar sin convertir produce errores de escala. | Sufijo de unidad en todos los nombres (§4.1); conversión documentada (kW por hora equivale a kWh de esa hora; por confirmar con XM). |
 | H8 | Las tablas de generación y capacidad traen nombre del recurso y código de agente; la de compras trae código de agente. En la muestra hay recursos de autogeneración a pequeña escala cuyo nombre parece corresponder a una persona natural (por ejemplo, «AGPE ALVARO HOYOS»). | Podrían ser datos personales bajo la Ley 1581, aunque los publique XM. | Clasificación «Parcial» en §9 y regla de minimización: en la capa curada se agrega por tipo de generación y combustible. |
-| H9 | Hay un valor negativo en compras (`-8,51`) y guiones «-» en celdas de generación y compras. | Un negativo en una cantidad de energía comprada no es un valor esperado, y un guion puede ser cero o dato ausente. | Reglas B-03 y GN-02; pendiente P6. |
+| H9 | Hay un valor negativo en compras (`-8,51`) y guiones «-» en celdas de generación y compras. En el archivo completo de compras de 2022 no se encontraron valores negativos; el `-8,51` de la muestra queda por confirmar en los demás años. | Un negativo en una cantidad de energía comprada no es un valor esperado, y un guion puede ser cero o dato ausente. | Reglas B-03 y GN-02; pendiente P6. |
 | H10 | Los nombres de algunos ríos traen el prefijo «A.» (por ejemplo, «A. SAN LORENZO») y la lista completa de regiones hidrológicas aún no está extraída. | Afecta la unicidad y la lista de valores válidos. | Reglas A-04 y A-05; pendiente P1. |
 | H11 | Las tablas se descargan por año («2022») y varios archivos; algunas fechas se ven como `#####` por el ancho de columna en el archivo. | Hay que consolidar archivos y leer las fechas del valor real, no del texto mostrado. | Política de ingesta (§4.2) y regla G-02. |
 | H12 | La tabla de reserva trae solo el porcentaje del volumen útil (`Volumen Útil Diario %`). La Entrega 1 y el documento de estrategia hablan de «volumen útil en energía». | Cualquier cifra en GWh que cite la estrategia no sale de este archivo. | Todo el plan usa `pct_volumen_util_diario`; pendiente P13 para confirmar si hay una serie en energía. |
@@ -165,6 +165,8 @@ Las actividades operativas de la Entrega 1 (operar la ingesta, resolver incident
 | Capas | `data/raw/`, `data/processed/validado/`, `data/processed/curado/` | — |
 | Notebooks | Prefijo numérico en orden de ejecución | `03_calidad_datos.ipynb` |
 | Versiones | SemVer | `v0.2.0` |
+
+> Nota: el estándar de nombres (por ejemplo `pct_volumen_util_diario`) se aplica en la capa curada. La capa normalizada actual conserva nombres como `volumen_util_diario_pct`; queda pendiente alinearla con el pipeline.
 
 ### 4.2 Ingesta y conservación
 
@@ -313,9 +315,11 @@ Los nombres estándar siguen la política de §4.1. Ninguna columna admite vací
 | Código Agente → `cod_agente` | Identificador del agente dueño del recurso | Código | GN-03 |
 | Tipo Despacho → `nom_tipo_despacho` | Si el recurso se despacha centralmente o no | Categoría | GN-02 |
 | 0 … 23 → `fec_hora` + `cant_generacion_kw` | Generación de cada hora; se pasa a formato largo | Decimal · kW | G-01, GN-01, GN-02, GN-04 |
-| Versión → `nom_version` | Versión de la liquidación (observada: `TX4`) | Código | GN-03 |
+| Versión → `nom_version` | Versión de la liquidación (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente) | Código | GN-03 |
 
 **DS-06 Capacidad**
+
+No incluido en los datos procesados de la segunda entrega.
 
 | Origen → estándar | Descripción | Tipo · unidad | Reglas |
 |---|---|---|---|
@@ -336,7 +340,7 @@ Los nombres estándar siguen la política de §4.1. Ninguna columna admite vací
 | Fecha → `fec_compra` | Día | Fecha · AAAA-MM-DD | G-02, B-02 |
 | Código Agente → `cod_agente` | Agente comprador | Código | B-02 |
 | 0 … 23 → `fec_hora` + `cant_compras_kwh` | Energía comprada en cada hora; formato largo | Decimal · kWh | G-01, B-01, B-03 |
-| Versión → `nom_version` | Versión de la liquidación (observada: `TX4`) | Código | B-02 |
+| Versión → `nom_version` | Versión de la liquidación (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente) | Código | B-02 |
 
 ### 6.3 Dataset curado (DS-08): campos previstos
 
@@ -386,14 +390,16 @@ Cada regla se mide en el notebook de calidad y produce un porcentaje de cumplimi
 
 ### 7.3 Reserva diaria (DS-02)
 
-| ID | Dimensión | Regla | Umbral | Sev. |
-|---|---|---|---|:---:|
-| R-01 | Completitud | 0 vacíos | 100 % | Alta |
-| R-02 | Completitud | 0 días faltantes entre el 01/01/2022 y la última fecha | 0 días | Alta |
-| R-03 | Validez | 0 fechas futuras y formato ISO | 100 % | Alta |
-| R-04 | Exactitud | Valor entre 0 y 100 | 100 % | Alta |
-| R-05 | Consistencia | Variación diaria de 5 puntos o menos (en la muestra: 0,54 como máximo) | 100 % *(umbral propuesto; lo aprueba el Data Owner)* | Media |
-| R-06 | Unicidad | Una fila por fecha | 0 duplicados | Alta |
+| ID | Dimensión | Regla | Umbral | Sev. | Resultado |
+|---|---|---|---|:---:|:---:|
+| R-01 | Completitud | 0 vacíos | 100 % | Alta | 100 % (0 vacíos) |
+| R-02 | Completitud | 0 días faltantes entre el 01/01/2022 y la última fecha | 0 días | Alta | 0 días faltantes en 1.731 días |
+| R-03 | Validez | 0 fechas futuras y formato ISO | 100 % | Alta | Cumple |
+| R-04 | Exactitud | Valor entre 0 y 100 | 100 % | Alta | 100 % (0 fuera de 0–100) |
+| R-05 | Consistencia | Variación diaria de 5 puntos o menos (en la muestra: 0,54 como máximo) | 100 % *(umbral propuesto; lo aprueba el Data Owner)* | Media | Cumple |
+| R-06 | Unicidad | Una fila por fecha | 0 duplicados | Alta | 0 duplicados |
+
+Fuente de los resultados: `notebooks/04_eda.ipynb`, §2.
 
 ### 7.4 Vertimientos (DS-03)
 
@@ -407,21 +413,21 @@ Cada regla se mide en el notebook de calidad y produce un porcentaje de cumplimi
 
 ### 7.5 Demanda (DS-04)
 
-| ID | Dimensión | Regla | Umbral | Sev. |
-|---|---|---|---|:---:|
-| D-01 | Completitud | Una fila por día, sin días faltantes | 0 días | Alta |
-| D-02 | Validez | Demanda y generación > 0; demanda no atendida, exportaciones e importaciones ≥ 0; las celdas vacías se tratan como 0 y se marcan | 100 % | Alta |
-| D-03 | Consistencia | Demanda = Generación + Importaciones − Exportaciones + Demanda no atendida (se cumple exacta en las 4 filas de muestra) | Diferencia de 1 kWh o menos | Alta |
-| D-04 | Unicidad | Una fila por fecha | 0 duplicados | Alta |
+| ID | Dimensión | Regla | Umbral | Sev. | Resultado |
+|---|---|---|---|:---:|:---:|
+| D-01 | Completitud | Una fila por día, sin días faltantes | 0 días | Alta | Cumple: 0 días faltantes en 1.730 días |
+| D-02 | Validez | Demanda y generación > 0; demanda no atendida, exportaciones e importaciones ≥ 0; las celdas vacías se tratan como 0 y se marcan | 100 % | Alta | Por medir |
+| D-03 | Consistencia | Demanda = Generación + Importaciones − Exportaciones + Demanda no atendida (se cumple exacta en las 4 filas de muestra) | Diferencia de 1 kWh o menos | Alta | Por medir |
+| D-04 | Unicidad | Una fila por fecha | 0 duplicados | Alta | Cumple: 0 duplicados por fecha |
 
 ### 7.6 Generación (DS-05)
 
-| ID | Dimensión | Regla | Umbral | Sev. |
-|---|---|---|---|:---:|
-| GN-01 | Completitud | Las 24 columnas horarias presentes; los guiones se interpretan según la confirmación de XM (P6) | 100 % de filas con 24 horas | Alta |
-| GN-02 | Validez | Valores ≥ 0 kW; tipo de generación, combustible y despacho dentro de sus listas | 100 % | Alta |
-| GN-03 | Unicidad | Una fila por fecha, recurso, código de agente y versión; se usa la versión vigente | 0 duplicados | Alta |
-| GN-04 | Consistencia | La suma diaria de la generación por recurso es compatible con la generación de la tabla de demanda | Tolerancia por definir al medir (P8) | Media |
+| ID | Dimensión | Regla | Umbral | Sev. | Resultado |
+|---|---|---|---|:---:|:---:|
+| GN-01 | Completitud | Las 24 columnas horarias presentes; los guiones se interpretan según la confirmación de XM (P6) | 100 % de filas con 24 horas | Alta | Por medir |
+| GN-02 | Validez | Valores ≥ 0 kW; tipo de generación, combustible y despacho dentro de sus listas | 100 % | Alta | Por medir |
+| GN-03 | Unicidad | Una fila por fecha, recurso, código de agente y versión; se usa la versión vigente (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente) | 0 duplicados | Alta | Por medir |
+| GN-04 | Consistencia | La suma diaria de la generación por recurso es compatible con la generación de la tabla de demanda | ≤ 0,1 % de diferencia relativa *(propuesta; la aprueba el Data Owner, P8)* | Media | Cumple: diferencia relativa máxima ≈ 0 % (5,3 × 10⁻¹⁵) en 1.729 días |
 
 ### 7.7 Capacidad (DS-06)
 
@@ -437,8 +443,8 @@ Cada regla se mide en el notebook de calidad y produce un porcentaje de cumplimi
 | ID | Dimensión | Regla | Umbral | Sev. |
 |---|---|---|---|:---:|
 | B-01 | Validez | El archivo corresponde a compras en kWh y no a precio en COP/kWh | Verificado en el título y en las unidades | Alta |
-| B-02 | Unicidad | Una fila por fecha, agente y versión | 0 duplicados | Alta |
-| B-03 | Exactitud | Compras ≥ 0 kWh; los negativos (como `-8,51` en la muestra) se reportan y se confirman con XM | 0 negativos sin explicar | Media |
+| B-02 | Unicidad | Una fila por fecha, agente y versión (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente) | 0 duplicados | Alta |
+| B-03 | Exactitud | Compras ≥ 0 kWh; los negativos (como `-8,51` en la muestra) se reportan y se confirman con XM. En el archivo completo de compras de 2022 no se encontraron valores negativos; el `-8,51` de la muestra queda por confirmar en los demás años | 0 negativos sin explicar | Media |
 
 ## 8. Linaje y trazabilidad
 
@@ -567,8 +573,8 @@ La línea base de HidroCol (columna «Línea base AS-IS») es la de la estrategi
 |---|---|---|---|---|---|
 | Cobertura de gobierno | Datasets con owner, steward, clasificación y diccionario ÷ datasets del alcance (7) × 100 | K3 | 0 %, no existe catálogo | 2 de 7 con ficha y diccionario completos (29 %); 5 con diccionario preliminar | 100 % |
 | Datasets de origen con Owner y Steward asignados | Datasets con ambos ÷ datasets de origen (7) | K3 | Sin asignar | 7 de 7 (los derivados se asignan al crearlos) | 100 % |
-| Calidad del dato | Registros que cumplen todas las reglas ÷ registros evaluados × 100 | K2 | Sin medición, no hay reglas | 42 reglas definidas, 0 medidas | 98 % o más |
-| Reglas con resultado medido | Reglas medidas ÷ reglas definidas (42) | K2 | — | 0 de 42 | 100 % |
+| Calidad del dato | Registros que cumplen todas las reglas ÷ registros evaluados × 100 | K2 | Sin medición, no hay reglas | 42 reglas definidas, 9 medidas; las 9 se cumplen al 100 % | 98 % o más |
+| Reglas con resultado medido | Reglas medidas ÷ reglas definidas (42) | K2 | — | 9 de 42 (R-01 a R-06, D-01, D-04, GN-04) | 100 % |
 | Incidentes de calidad resueltos a tiempo | Incidentes resueltos o aprobados en 2 días hábiles o menos ÷ incidentes abiertos × 100 | K7 | No aplica | Sin incidentes aún | 90 % o más |
 | Capa curada lista antes de las 7:00 a. m. | Días con la capa lista a tiempo ÷ días del periodo × 100 | K1 | Cerca de 14 % (semanal o a solicitud) | Por medir | 95 % o más |
 | Transformaciones con linaje registrado | Transformaciones registradas ÷ transformaciones (8) × 100 | A2 | 0 % | 0 de 8 | 100 % |
@@ -627,7 +633,7 @@ Para no confundirlos: en la estrategia, «Fase 1» y «Fase 2» son las fases de
 | P11 | Completar las fichas de DS-03 a DS-07 (17 campos) y confirmar con la docente si se exigen | Data Steward |
 | P12 | Confirmar el buzón `gobiernodatos@hidrocol.com.co` como contacto oficial del Data Office | Data Owner |
 | P13 | Confirmar si Sinergox ofrece la reserva también en energía (GWh) o si el proyecto trabaja solo con el porcentaje; ajustar la Entrega 1 y la estrategia en consecuencia | Data Steward |
-| P14 | Completar con el notebook 04 el dato propio de la estrategia (variación máxima 2024–2026 y días bajo el nivel de referencia, ambos en porcentaje) | Paula Andrea Olier Alba |
+| P14 | *Resuelto:* el notebook 04 calcula el dato propio de la estrategia: caída máxima a 30 días de −14,4 pp (feb-2024), 78 días por debajo del 40 % y 140 días por debajo del 50 % entre 2022 y 2026 | Rafael José Gutiérrez Realpe (notebook 04) |
 | P15 | Decidir quién representa al CDO en la presentación y en la defensa, porque ningún integrante tiene ese rol asignado | Equipo |
 
 ## Control de versiones del documento
@@ -637,3 +643,4 @@ Para no confundirlos: en la estrategia, «Fase 1» y «Fase 2» son las fases de
 | v0.1 | 2026-09-28 | Borrador inicial: estructura, RACI, políticas, catálogo y reglas genéricas |
 | v0.2 | 2026-10-22 | Datos reales de Sinergox, hallazgos, catálogo y diccionario del equipo, matriz RACI de siete tareas con roles asignados, reglas de calidad por dataset, linaje, clasificación con revisión de PII, control de acceso, madurez e indicadores |
 | v0.2.1 | 2026-10-23 | Alineación con el documento de estrategia: CDO y comités, ubicación de los roles en el organigrama to-be, KPI K1 a K8 y objetivos del BSC, regla G-06 de oportunidad del dashboard, relación con el roadmap, hallazgo H12 sobre la reserva en porcentaje y pendientes P13 a P15 |
+| v0.2.2 | 2026-10-23 | Resultados de calidad medidos en el EDA (R-01 a R-06, D-01, D-04 y GN-04; 9 de 42 reglas medidas, todas cumplidas), tolerancia propuesta de GN-04 (≤ 0,1 % de diferencia relativa), cierre de P14 con la caída máxima a 30 días y los días bajo 40 % y 50 %, versiones de liquidación observadas (`TX1` a `TX8` y `TXF`) en H4, GN-03 y B-02, ausencia de negativos en las compras de 2022 (H9 y B-03), nota sobre nombres de la capa normalizada (§4.1) y DS-06 fuera de los datos procesados |
