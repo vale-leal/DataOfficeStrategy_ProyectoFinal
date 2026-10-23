@@ -37,6 +37,13 @@ Antes de programar la ingesta se verificará la cobertura diaria de 2022–2026,
 - La primera fase prioriza visibilidad, calidad y trazabilidad. Pronósticos, despacho y servicios públicos de datos requieren una ampliación del alcance.
 - Los horarios, porcentajes de calidad y tiempos de alerta son metas de diseño pendientes de validación.
 
+## Cómo ejecutar el proyecto
+
+1. Instalar las dependencias: `pip install -r requirements.txt`.
+2. Descomprimir `data/raw/HidrologiaYGeneracionEnergetica_7065.rar` dentro de `data/raw/`, de modo que queden carpetas por colección con los `.xlsx` (`data/raw/<Coleccion>/*.xlsx`).
+3. Ejecutar `python run_pipeline.py`, que genera `data/processed/ingesta`, `data/processed/normalizado` y `data/processed/calidad`.
+4. Abrir `notebooks/04_eda.ipynb` y ejecutar todo (Restart & Run All).
+
 ## Próximas entregas
 
 En la segunda entrega se desarrollarán los notebooks de ingesta, limpieza y análisis exploratorio; una tarea automatizada (ingesta programada y alerta con Power Automate); y el primer Plan de Gobierno de Datos con métricas. En la entrega final se completarán el gobierno aplicado al dataset, el dashboard, la arquitectura y las instrucciones para ejecutar el proyecto.
