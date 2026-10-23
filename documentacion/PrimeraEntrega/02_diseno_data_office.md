@@ -47,13 +47,6 @@ flowchart TD
 | Analista de datos | Construye indicadores, EDA y dashboard |
 | Consumidor (Gerencia / Comité de riesgo) | Usa dashboard y alertas para decidir y registra sus decisiones |
 
-### Mapa del equipo *(ajustar con nombres reales)*
-
-| Integrante | Roles asumidos |
-|---|---|
-| _[Integrante 1]_ | CDO · Data Owner (simulado) |
-| _[Integrante 2]_ | Data Steward · Arquitecto de datos |
-| _[Integrante 3]_ | Custodio técnico · Analista de datos |
 
 ## 4. Forma de trabajo
 
@@ -81,7 +74,3 @@ flowchart TD
 | Seguridad y privacidad | 2 | 3 |
 
 *Escala 1 (ad hoc) a 5 (optimizado). Valores de diagnóstico propuestos para el caso hipotético.*
-
-## 6. Matriz RACI
-
-Ver [`Plan_Gobierno_Datos.md`](Plan_Gobierno_Datos.md#2-roles-y-responsabilidades-raci).

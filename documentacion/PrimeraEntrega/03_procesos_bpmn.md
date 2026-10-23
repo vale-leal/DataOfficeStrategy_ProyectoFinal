@@ -6,9 +6,6 @@
 
 ## 1. Proceso AS-IS (situación actual)
 
-![BPMN AS-IS](Diagramas/BPMN_AS-IS_HidroData.png)
-*Figura 1. BPMN AS-IS — monitoreo manual de reservas hídricas. Marcadores P1–P6 = puntos de dolor.*
-
 **Carriles:** Analista de datos · Gerencia / Comité de riesgo.
 
 Hoy el monitoreo depende del analista. Una vez por semana, o cuando la gerencia lo pide, descarga los reportes de XM en Excel, los consolida en una hoja de cálculo y los revisa a ojo, sin reglas de calidad. Si según su criterio el nivel es preocupante, envía un correo con el reporte adjunto; si no, se archiva. La Gerencia y el Comité lo revisan días después y deciden en reunión, sin registrar la decisión ni los datos que la motivaron.
@@ -36,9 +33,6 @@ Hoy el monitoreo depende del analista. Una vez por semana, o cuando la gerencia 
 | P6 | Decisión no documentada: no queda registro de qué se decidió ni con qué datos |
 
 ## 3. Proceso TO-BE
-
-![BPMN TO-BE](Diagramas/BPMN_TO_BE_HidroData.png)
-*Figura 2. BPMN TO-BE — monitoreo automatizado y gobernado de reservas hídricas.*
 
 **Carriles:** Sistema automatizado · Data Steward · Gerencia / Comité de riesgo.
 
