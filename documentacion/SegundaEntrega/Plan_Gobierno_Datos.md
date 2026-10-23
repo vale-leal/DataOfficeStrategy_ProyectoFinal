@@ -1,6 +1,6 @@
 # Plan de Gobierno de Datos — HidroData SIN
 
-**Versión:** 0.2.1 **Fecha:** 23 de octubre de 2026
+**Versión:** 0.2.2 **Fecha:** 23 de octubre de 2026
 **Caso:** HidroCol Generación S.A. E.S.P. 
 **Fuente:** XM — Sinergox, 2022–2026
 **Marco:** DAMA-DMBOK 2 · Ley 1581 de 2012 · Ley 1712 de 2014
@@ -415,10 +415,10 @@ Fuente de los resultados: `notebooks/04_eda.ipynb`, §2.
 
 | ID | Dimensión | Regla | Umbral | Sev. | Resultado |
 |---|---|---|---|:---:|:---:|
-| D-01 | Completitud | Una fila por día, sin días faltantes | 0 días | Alta | Por medir |
+| D-01 | Completitud | Una fila por día, sin días faltantes | 0 días | Alta | Cumple: 0 días faltantes en 1.730 días |
 | D-02 | Validez | Demanda y generación > 0; demanda no atendida, exportaciones e importaciones ≥ 0; las celdas vacías se tratan como 0 y se marcan | 100 % | Alta | Por medir |
 | D-03 | Consistencia | Demanda = Generación + Importaciones − Exportaciones + Demanda no atendida (se cumple exacta en las 4 filas de muestra) | Diferencia de 1 kWh o menos | Alta | Por medir |
-| D-04 | Unicidad | Una fila por fecha | 0 duplicados | Alta | Cumple (0 duplicados, 0 días faltantes) |
+| D-04 | Unicidad | Una fila por fecha | 0 duplicados | Alta | Cumple: 0 duplicados por fecha |
 
 ### 7.6 Generación (DS-05)
 
@@ -427,7 +427,7 @@ Fuente de los resultados: `notebooks/04_eda.ipynb`, §2.
 | GN-01 | Completitud | Las 24 columnas horarias presentes; los guiones se interpretan según la confirmación de XM (P6) | 100 % de filas con 24 horas | Alta | Por medir |
 | GN-02 | Validez | Valores ≥ 0 kW; tipo de generación, combustible y despacho dentro de sus listas | 100 % | Alta | Por medir |
 | GN-03 | Unicidad | Una fila por fecha, recurso, código de agente y versión; se usa la versión vigente (versiones observadas `TX1` a `TX8` y `TXF`; una sola versión por día y agente) | 0 duplicados | Alta | Por medir |
-| GN-04 | Consistencia | La suma diaria de la generación por recurso es compatible con la generación de la tabla de demanda | Tolerancia por definir al medir (P8) | Media | Cumple: diferencia máxima de 5,3e-15 en 1.729 días |
+| GN-04 | Consistencia | La suma diaria de la generación por recurso es compatible con la generación de la tabla de demanda | ≤ 0,1 % de diferencia relativa *(propuesta; la aprueba el Data Owner, P8)* | Media | Cumple: diferencia relativa máxima ≈ 0 % (5,3 × 10⁻¹⁵) en 1.729 días |
 
 ### 7.7 Capacidad (DS-06)
 
@@ -573,8 +573,8 @@ La línea base de HidroCol (columna «Línea base AS-IS») es la de la estrategi
 |---|---|---|---|---|---|
 | Cobertura de gobierno | Datasets con owner, steward, clasificación y diccionario ÷ datasets del alcance (7) × 100 | K3 | 0 %, no existe catálogo | 2 de 7 con ficha y diccionario completos (29 %); 5 con diccionario preliminar | 100 % |
 | Datasets de origen con Owner y Steward asignados | Datasets con ambos ÷ datasets de origen (7) | K3 | Sin asignar | 7 de 7 (los derivados se asignan al crearlos) | 100 % |
-| Calidad del dato | Registros que cumplen todas las reglas ÷ registros evaluados × 100 | K2 | Sin medición, no hay reglas | 42 reglas definidas, 0 medidas | 98 % o más |
-| Reglas con resultado medido | Reglas medidas ÷ reglas definidas (42) | K2 | — | 8 de 42 (R-01 a R-06, D-04, GN-04) | 100 % |
+| Calidad del dato | Registros que cumplen todas las reglas ÷ registros evaluados × 100 | K2 | Sin medición, no hay reglas | 42 reglas definidas, 9 medidas; las 9 se cumplen al 100 % | 98 % o más |
+| Reglas con resultado medido | Reglas medidas ÷ reglas definidas (42) | K2 | — | 9 de 42 (R-01 a R-06, D-01, D-04, GN-04) | 100 % |
 | Incidentes de calidad resueltos a tiempo | Incidentes resueltos o aprobados en 2 días hábiles o menos ÷ incidentes abiertos × 100 | K7 | No aplica | Sin incidentes aún | 90 % o más |
 | Capa curada lista antes de las 7:00 a. m. | Días con la capa lista a tiempo ÷ días del periodo × 100 | K1 | Cerca de 14 % (semanal o a solicitud) | Por medir | 95 % o más |
 | Transformaciones con linaje registrado | Transformaciones registradas ÷ transformaciones (8) × 100 | A2 | 0 % | 0 de 8 | 100 % |
@@ -643,4 +643,4 @@ Para no confundirlos: en la estrategia, «Fase 1» y «Fase 2» son las fases de
 | v0.1 | 2026-09-28 | Borrador inicial: estructura, RACI, políticas, catálogo y reglas genéricas |
 | v0.2 | 2026-10-22 | Datos reales de Sinergox, hallazgos, catálogo y diccionario del equipo, matriz RACI de siete tareas con roles asignados, reglas de calidad por dataset, linaje, clasificación con revisión de PII, control de acceso, madurez e indicadores |
 | v0.2.1 | 2026-10-23 | Alineación con el documento de estrategia: CDO y comités, ubicación de los roles en el organigrama to-be, KPI K1 a K8 y objetivos del BSC, regla G-06 de oportunidad del dashboard, relación con el roadmap, hallazgo H12 sobre la reserva en porcentaje y pendientes P13 a P15 |
-| v0.2.2 | 2026-10-23 | Resultados de calidad medidos en el EDA (R-01 a R-06, D-04 y GN-04; 8 de 42 reglas medidas), cierre de P14 con la caída máxima a 30 días y los días bajo 40 % y 50 %, versiones de liquidación observadas (`TX1` a `TX8` y `TXF`) en H4, GN-03 y B-02, ausencia de negativos en las compras de 2022 (H9 y B-03), nota sobre nombres de la capa normalizada (§4.1) y DS-06 fuera de los datos procesados |
+| v0.2.2 | 2026-10-23 | Resultados de calidad medidos en el EDA (R-01 a R-06, D-01, D-04 y GN-04; 9 de 42 reglas medidas, todas cumplidas), tolerancia propuesta de GN-04 (≤ 0,1 % de diferencia relativa), cierre de P14 con la caída máxima a 30 días y los días bajo 40 % y 50 %, versiones de liquidación observadas (`TX1` a `TX8` y `TXF`) en H4, GN-03 y B-02, ausencia de negativos en las compras de 2022 (H9 y B-03), nota sobre nombres de la capa normalizada (§4.1) y DS-06 fuera de los datos procesados |
