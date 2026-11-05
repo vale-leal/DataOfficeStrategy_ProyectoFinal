@@ -1,0 +1,9 @@
+# Excel de Gobierno de Datos: qué se hizo y qué se entrega
+
+**Qué se hizo.** Partimos de los 7 Excel de la plantilla de la docente (uno por tabla de XM) y del script que los generó. Los revisamos contra los datos crudos, contra el pipeline de ingesta y normalización (`limpieza.py`) y contra el script de calidad de las tablas grandes. Los resultados de las 6 reglas de cada tabla no cambiaron; lo que se corrigió fue el texto: un cambio de región escrito al revés (SAN FRANCISCO pasa de CALDAS a CENTRO en sep 2025), acciones que atribuían al pipeline tareas que no hace (ahora son recomendaciones, o describen lo que sí hace `limpieza.py`), y la hoja de seguridad, que ahora clasifica solo columnas originales de la fuente.
+
+**Cómo se midió.** Se midió la capa raw, es decir, los datos tal como llegan de XM antes del pipeline, con 6 reglas por tabla (una por dimensión de calidad). Las tablas pequeñas (Aportes, Reservas, Vertimientos y Demanda) se miden con fórmulas de Excel sobre los datos completos pegados en `4_Datos`. Las grandes (Generación, Capacidad y Compras en bolsa) se miden en Python porque no caben en una hoja o Excel no alcanza a calcular la unicidad; en esos archivos `1_Calidad` trae los conteos del script y `4_Datos` la evidencia.
+
+**Qué reproduce el script.** `construir_gobierno.py` arma la parte medible de los 7 archivos: pega los datos, escribe las fórmulas y carga los conteos de las tablas grandes. No genera la causa probable ni la acción de `1_Calidad`, ni las hojas `2_Seguridad` y `3_Maestros`: ese análisis lo redactamos a mano y está en los Excel entregados.
+
+**Archivos finales en la documentación.** Los 7 Excel completos (`S2_Gobierno_EquipoX_DS01_Aportes.xlsx` a `DS07_ComprasBolsa.xlsx`), el script `construir_gobierno.py`, los scripts que le entregan datos (`consolidar.py` y `calidad_tablas_grandes.py`) con su salida `metricas_calidad_grandes.csv`. Para correr los scripts hace falta el `.rar` de datos crudos del repositorio. 
