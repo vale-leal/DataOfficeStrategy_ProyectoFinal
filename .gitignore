@@ -4,14 +4,20 @@ __pycache__/
 .venv/
 venv/
 .ipynb_checkpoints/
+
 # Datos pesados o temporales
+# - data/raw: solo se versiona el .rar (Git LFS); las carpetas descomprimidas se ignoran
+# - data/processed: lo genera run_pipeline.py
 data/raw/*
-data/processed/*
 !data/raw/.gitkeep
+!data/raw/*.rar
+data/processed/*
 !data/processed/.gitkeep
+
 # Credenciales y entorno
 .env
 *.key
+
 # Sistema
 .DS_Store
 Thumbs.db
