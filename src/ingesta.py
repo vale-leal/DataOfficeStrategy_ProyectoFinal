@@ -87,8 +87,11 @@ def main():
     """Recorre cada subcarpeta de data/raw como una colección e imprime el resumen final."""
     DIR_SALIDA.mkdir(parents=True, exist_ok=True)
     resumen = []
+    # El .rar trae una carpeta raíz (HidrologiaYGeneracionEnergetica/); se acepta con o sin ella
+    base = DIR_RAW / "HidrologiaYGeneracionEnergetica"
+    base = base if base.is_dir() else DIR_RAW
     # El nombre de la colección sale de la carpeta, no de una lista fija
-    for carpeta in sorted(p for p in DIR_RAW.iterdir() if p.is_dir()):
+    for carpeta in sorted(p for p in base.iterdir() if p.is_dir()):
         unida = ingestar_coleccion(carpeta)
         resumen.append((carpeta.name, len(unida), unida.shape[1]))
         print()

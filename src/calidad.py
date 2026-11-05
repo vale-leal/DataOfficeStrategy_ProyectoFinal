@@ -12,7 +12,9 @@ DIR_SALIDA = RAIZ / "data" / "processed" / "calidad"
 
 HORAS = [f"hora_{h:02d}" for h in range(24)]
 FECHA_MIN = pd.Timestamp("2022-01-01")
-HOY = pd.Timestamp.today().normalize()
+# Fecha de descarga de los .xlsx de Sinergox (manifiesto de la ingesta). Una fecha posterior es inválida.
+# Se fija para que la regla dé lo mismo sin importar el día en que se corra el pipeline.
+FECHA_DESCARGA = pd.Timestamp("2026-09-28")
 FACTOR_IQR = 3  # 3*IQR marca solo valores extremos, no la variación normal de la serie
 METRICAS = []  # cada registrar() agrega aquí una fila; al final se vuelca al CSV
 
@@ -105,7 +107,7 @@ def medir_validez(nombre, df, medidas, duplicada):
     # Solo reservas tiene porcentaje; en las demás get() devuelve una serie vacía (sin registros fuera)
     porcentaje = df.get("volumen_util_diario_pct", pd.Series(float("nan"), index=df.index))
     pct_fuera = porcentaje.notna() & ~porcentaje.between(0, 100)  # un nulo no invalida el registro
-    fecha_mala = df["fecha"].isna() | (df["fecha"] < FECHA_MIN) | (df["fecha"] > HOY)
+    fecha_mala = df["fecha"].isna() | (df["fecha"] < FECHA_MIN) | (df["fecha"] > FECHA_DESCARGA)
     registrar(nombre, "registros_medida_negativa", int(negativo.sum()))
     registrar(nombre, "registros_pct_fuera_0_100", int(pct_fuera.sum()))
     registrar(nombre, "registros_fecha_fuera_rango", int(fecha_mala.sum()))
