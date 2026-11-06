@@ -32,7 +32,7 @@
 | Gobierno de datos | §3 Roles y RACI, §4 Políticas |
 | Metadatos | §5 Catálogo, §6 Diccionario y glosario |
 | Calidad de datos | §7 Reglas de calidad |
-| Arquitectura e integración | §8 Linaje (ver [ArchiMate](05_arquitectura_archimate.md)) |
+| Arquitectura e integración | §8 Linaje (ver [ArchiMate](../EstrategiaOrganizacion/05_arquitectura_archimate.md)) |
 | Seguridad y privacidad | §9 Clasificación, §10 Control de acceso, §11 Cumplimiento |
 
 ### 1.1 Alineación con la estrategia corporativa

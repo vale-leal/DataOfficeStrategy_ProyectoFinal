@@ -1,48 +1,88 @@
 # HidroData SIN
 
-**Versión:** 0.1 · **Entrega:** primera entrega parcial · **Caso:** HidroCol Generación S.A. E.S.P. (empresa hipotética)
+**Versión:** 1.0 · **Entrega:** final (noviembre de 2026) · **Curso:** Data Office Strategy · **Caso:** HidroCol Generación S.A. E.S.P. (empresa hipotética)
 
 ## Resumen
 
-HidroData propone un Data Office para que la gerencia de una generadora con alta dependencia hidráulica pueda seguir las reservas del Sistema Interconectado Nacional, revisar alertas y documentar sus decisiones. La ventana de análisis acordada es **2022–2026**; para 2026 se usará la última fecha disponible al extraer la fuente. Esta primera entrega define la estrategia, los responsables, los procesos y la arquitectura propuesta. Todavía no presenta un pipeline ni un tablero en operación.
+HidroCol es una generadora con parque mayoritariamente hidráulico que hoy monitorea sus reservas con descargas manuales, sin reglas de calidad y sin registrar sus decisiones. HidroData SIN es la solución: un **Data Office federado** que gobierna los datos abiertos de XM (Sinergox), un **pipeline en Python** que los descarga, limpia y valida, un **análisis exploratorio** que fija umbrales de riesgo, una **alerta automática** con Power Automate y un **dashboard** para que el Comité de Riesgo Hídrico decida a tiempo y deje constancia.
 
-## Problema y enfoque
+Datos: 7 colecciones de XM Sinergox, 2022–2026, ≈ 2,1 millones de registros (aportes, reservas, vertimientos, demanda, generación, capacidad efectiva y compras en bolsa).
 
-En el caso hipotético, el analista descarga reportes de XM, consolida hojas de cálculo y aplica criterios de riesgo sin reglas documentadas. El proceso propuesto incorpora ingesta diaria, controles de calidad, revisión de excepciones, publicación de indicadores, alerta por correo y registro de las decisiones. El Data Office híbrido define estándares centrales y deja la aprobación del significado del dato y de los umbrales en Planeación Energética.
+## Mapa de la rúbrica
 
-## Contenido de esta entrega
+| # | Criterio (peso) | Dónde está |
+|---|---|---|
+| 1 | Problema, estrategia y diseño organizacional (10 %) | [`documentacion/EstrategiaOrganizacion/`](documentacion/EstrategiaOrganizacion/) — `01_problema_y_estrategia.md`, `02_diseno_data_office.md` |
+| 2 | Procesos BPMN (10 %) | [`03_procesos_bpmn.md`](documentacion/EstrategiaOrganizacion/03_procesos_bpmn.md) y diagramas AS-IS / TO-BE en [`documentacion/BPMNyArchiMate/`](documentacion/BPMNyArchiMate/) |
+| 3 | Automatización RPA (10 %) | [`automatizacion/`](automatizacion/) — flujo de alerta en Power Automate que lee `reservas_alerta.xlsx` |
+| 4 | Arquitectura ArchiMate (10 %) | [`05_arquitectura_archimate.md`](documentacion/EstrategiaOrganizacion/05_arquitectura_archimate.md), modelo editable `HidroData_ArchiMate_v1.archimate` |
+| 5 | Ingesta, limpieza y EDA en Python (10 %) | [`run_pipeline.py`](run_pipeline.py), [`src/`](src/), [`notebooks/`](notebooks/) |
+| 6 | Gobierno de datos (30 %) | [`documentacion/PlanDeGobierno/`](documentacion/PlanDeGobierno/) — Plan de Gobierno, RACI, Excel de catálogo, diccionario y calidad por dataset, scripts de medición |
+| 7 | Visualización / dashboard (10 %) | [`dashboard/`](dashboard/) |
+| 8 | Trabajo colaborativo y documentación (10 %) | Este README, historial de commits y Pull Requests |
 
-| Requisito | Archivo |
-| --- | --- |
-| Problema, necesidad y estrategia | `documentacion/01_problema_y_estrategia.md` |
-| Organización y diseño del Data Office | `documentacion/02_diseno_data_office.md` |
-| BPMN actual (AS-IS), mejoras y BPMN propuesto (TO-BE) | `documentacion/03_procesos_bpmn.md`; `documentacion/img/bpmn_as_is.png`; `documentacion/img/bpmn_to_be.jpeg` |
-| Selección de datos y ventana 2022–2026 | `documentacion/04_seleccion_datos_abiertos.md` |
-| Boceto ArchiMate en tres capas | `documentacion/05_arquitectura_archimate.md`; `documentacion/img/archimate_boceto.jpeg` |
-| Borrador inicial del Plan de Gobierno (adelanto de la segunda entrega) | `documentacion/Plan_Gobierno_Datos.md` |
+## Estructura del repositorio
 
-Los diagramas se conservan como imágenes suministradas por el equipo; no se adjuntaron sus archivos editables.
+```
+├── README.md
+├── requirements.txt
+├── run_pipeline.py              # orquesta ingesta → normalización y limpieza → calidad
+├── src/                         # ingesta.py, normalizacion.py, limpieza.py, calidad.py
+├── data/
+│   ├── raw/                     # HidrologiaYGeneracionEnergetica_7065.rar (Git LFS)
+│   └── processed/               # lo genera el pipeline (no se versiona)
+├── notebooks/                   # 01 ingesta, limpieza y calidad · 04 EDA
+├── img/eda/                     # gráficos del EDA
+├── documentacion/
+│   ├── EstrategiaOrganizacion/  # problema, Data Office, BPMN, datos, arquitectura
+│   ├── BPMNyArchiMate/          # diagramas BPMN y ArchiMate (+ fuente/ para regenerar ArchiMate)
+│   └── PlanDeGobierno/          # Plan de Gobierno, RACI, Excel S2 y scripts de calidad
+├── automatizacion/              # Power Automate: tabla de alerta y evidencia del flujo
+└── dashboard/                   # dashboard final
+```
 
-## Fuente seleccionada
+## Herramientas
 
-- [XM Sinergox](https://sinergox.xm.com.co), portal de información del mercado de energía mayorista. Es la fuente propuesta para todo el análisis.
-- Variables previstas: reservas hídricas (variable principal), aportes hídricos, vertimientos, precio de bolsa nacional, demanda, capacidad y generación real. Las reservas y los aportes responden directamente a la necesidad de negocio; las demás son variables de contexto.
-- Referencia para aportes: [Detalle de Aportes Hídricos](https://sinergox.xm.com.co/hdrlg/Paginas/Informes/DetalleAportesHidricos.aspx).
+| Uso | Herramienta |
+|---|---|
+| Datos | XM Sinergox (exportación de históricos en Excel) |
+| Procesamiento y análisis | Python 3.10–3.12, pandas, pyarrow, matplotlib, JupyterLab |
+| Gobierno | Excel de la plantilla del curso (catálogo, diccionario, calidad, seguridad, maestros) + scripts Python |
+| Automatización | Microsoft Power Automate, Outlook, OneDrive |
+| Modelado | BPMN (diagramas TO-BE / AS-IS), ArchiMate (Archi) |
+| Versionamiento | GitHub + Git LFS |
 
-Antes de programar la ingesta se verificará la cobertura diaria de 2022–2026, los campos, las unidades, la granularidad por embalse y región, la fecha real de publicación y la forma de descarga. Sinergox no figura entre las fuentes sugeridas en la guía del curso; se confirmará con la docente que cumple el requisito.
+## Cómo ejecutar el proyecto
+
+1. **Clonar con los datos.** El `.rar` está en Git LFS: instalar [Git LFS](https://git-lfs.com) y ejecutar `git lfs pull` después de clonar (o descargar el `.rar` desde la página del repositorio).
+2. **Instalar dependencias** (Python 3.10 a 3.12): `pip install -r requirements.txt`.
+3. **Descomprimir** `data/raw/HidrologiaYGeneracionEnergetica_7065.rar` dentro de `data/raw/` con 7-Zip, WinRAR o `unar`. Queda `data/raw/HidrologiaYGeneracionEnergetica/<Coleccion>/*.xlsx`; la ingesta también acepta las carpetas de colección directamente en `data/raw/`.
+4. **Ejecutar el pipeline** desde la raíz: `python run_pipeline.py` (≈ 5 minutos). Genera `data/processed/ingesta`, `normalizado` y `calidad`.
+5. **Abrir los notebooks** en orden (`01`, `04`) y ejecutar *Restart & Run All*. El EDA genera `data/processed/eda/eda_mensual.parquet` y `automatizacion/reservas_alerta.xlsx`.
+6. **Regenerar el ArchiMate** (opcional): `python documentacion/BPMNyArchiMate/fuente/generar_archimate.py`.
+
+## Equipo y roles del Data Office
+
+| Integrante | Rol en el gobierno del dato (RACI) | Responsabilidad en el proyecto |
+|---|---|---|
+| Sara Rúa García | Data Owner | Gobierno de datos aplicado, reglas de calidad, estructura y coherencia del repositorio |
+| Rafael José Gutiérrez Realpe | Data Steward | EDA y notebooks, arquitectura ArchiMate, documentación |
+| Valentina Leal Noreña | Custodio técnico | Pipeline de ingesta y limpieza, estrategia, dashboard |
+| Paula Andrea Olier Alba | Consumidor / Analista | Automatización con Power Automate, BPMN, guion del pitch |
+
+Cada integrante trabaja en su rama y entra a `main` por Pull Request revisado por otra persona.
 
 ## Decisiones de alcance
 
-- La organización y su proceso actual son un caso académico hipotético. Las cifras sectoriales citadas corresponden al SIN, no al desempeño de HidroCol.
-- La primera fase prioriza visibilidad, calidad y trazabilidad. Pronósticos, despacho y servicios públicos de datos requieren una ampliación del alcance.
-- Los horarios, porcentajes de calidad y tiempos de alerta son metas de diseño pendientes de validación.
+- HidroCol y su proceso actual son un caso académico hipotético; las cifras corresponden al SIN, no a HidroCol.
+- La fuente es XM Sinergox, operador oficial del mercado; no está en la lista de fuentes sugeridas de la guía.
+- El dataset de «precio» de Sinergox trae **compras en bolsa (kWh)**, no precio; se usa como señal de volumen.
+- Los umbrales de alerta (vigilancia 50 %, crítico 40 % del volumen útil) son propuestas del EDA; los aprueba el Data Owner.
 
-## Próximas entregas
+## Historial de versiones
 
-En la segunda entrega se desarrollarán los notebooks de ingesta, limpieza y análisis exploratorio; una tarea automatizada (ingesta programada y alerta con Power Automate); y el primer Plan de Gobierno de Datos con métricas. En la entrega final se completarán el gobierno aplicado al dataset, el dashboard, la arquitectura y las instrucciones para ejecutar el proyecto.
-
-La estructura prevista es `/notebooks`, `/documentacion`, `/automatizacion` y `/dashboard`, conforme a la guía del curso. Por ahora las carpetas de implementación solo contienen un README que describe su propósito; se llenarán con trabajo real en las siguientes entregas.
-
-## Trabajo colaborativo
-
-Cada integrante debe registrar sus cambios en commits descriptivos y revisar el contenido antes de integrarlo (ver `CONTRIBUTING.md`). El equipo añadirá aquí la identificación de sus tres miembros y el enlace del repositorio al momento de la entrega.
+| Versión | Fecha | Contenido |
+|---|---|---|
+| 0.1 | 28-sep-2026 | Problema, estrategia, Data Office, BPMN, selección de datos y boceto ArchiMate |
+| 0.2 | 23-oct-2026 | Pipeline, EDA, salida para Power Automate y Plan de Gobierno v0.2 |
+| 1.0 | nov-2026 | Gobierno aplicado, ArchiMate v1.0, notebooks finales, automatización y dashboard |

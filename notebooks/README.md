@@ -1,11 +1,12 @@
-# 📓 Notebooks
+# Notebooks
 
-| # | Notebook | Propósito | Entrega |
+Ejecutar en orden desde la raíz del repositorio, después de descomprimir los datos (ver el [README](../README.md#cómo-ejecutar-el-proyecto)). Antes de cada entrega: *Restart & Run All*.
+
+| # | Notebook | Qué hace | Rúbrica |
 |---|---|---|---|
-| 01 | `01_ingesta.ipynb` | Extraer las variables de Sinergox a `data/raw/` con fecha y hash (M1) | 2.ª (23 oct) |
-| 02 | `02_limpieza_normalizacion.ipynb` | Homologar unidades, fechas y granularidad → `validado` | 2.ª |
-| 03 | `03_calidad_datos.ipynb` | Medir las reglas de calidad y registrar métricas (M2) | 2.ª |
-| 04 | `04_eda.ipynb` | EDA: preguntas P1–P6 de la [estrategia](../documentacion/01_problema_y_estrategia.md), umbrales candidatos | 2.ª |
-| 05 | `05_visualizacion.ipynb` | Indicadores y gráficos del dashboard (M4) | Final (13 nov) |
+| 01 | [`01_ingesta_limpieza_calidad.ipynb`](01_ingesta_limpieza_calidad.ipynb) | Ejecuta `run_pipeline.py` (o reutiliza su salida) y muestra la evidencia de cada etapa: filas por colección, esquema normalizado, bitácoras de incidentes e imputaciones y métricas de calidad | 5 y 6 |
+| 04 | [`04_eda.ipynb`](04_eda.ipynb) | Análisis exploratorio de las preguntas P1–P6: reservas, aportes, generación, capacidad, demanda, vertimientos y compras en bolsa. Produce `data/processed/eda/eda_mensual.parquet` (dashboard) y `automatizacion/reservas_alerta.xlsx` (Power Automate) | 5 |
 
-**Convenciones:** ejecutar en orden; `raw` inmutable; nomenclatura según [Plan de Gobierno §3.1](../documentacion/Plan_Gobierno_Datos.md); *Restart & Run All* antes de cada entrega.
+La lógica de ingesta, normalización, limpieza y calidad vive en `src/` (scripts que se ejecutan igual cada vez); los notebooks la leen y explican. Las reglas de calidad formales por ID (Plan de Gobierno §7) se miden en `documentacion/PlanDeGobierno/`.
+
+**Convenciones:** los notebooks no modifican `data/raw/`; las rutas se calculan desde la raíz del repositorio, así que funcionan desde `notebooks/` o desde la raíz.
